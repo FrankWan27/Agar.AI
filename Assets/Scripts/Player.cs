@@ -10,7 +10,7 @@ public class Player
     public float size;
     public float scale;
 
-    public float id;
+    //public Color color;
 
     public Player(PlayerController pc)
     {
@@ -24,7 +24,7 @@ public class Player
         y = Random.Range(-Utils.GAME_HEIGHT / 2, Utils.GAME_HEIGHT / 2);
         pc.transform.position = new Vector3(x, y);
         size = 1f;
-        id = UnityEngine.Random.Range(0, 10000);
+        //color = Utils.RandomColor();
         UpdateScale();
     }
 
@@ -43,7 +43,9 @@ public class Player
     public void Move(float dx, float dy)
     {
 
-        pc.transform.Translate(dx * Time.deltaTime, dy * Time.deltaTime, 0);
+        float speed = 2.2f * Mathf.Pow(size,-0.439f);
+
+        pc.transform.Translate(speed * dx * Time.deltaTime, speed * dy * Time.deltaTime, 0);
 
         x = pc.transform.position.x;
         y = pc.transform.position.y;

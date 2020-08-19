@@ -9,10 +9,9 @@ public class PlayerController : MonoBehaviour
 {
     enum Mode {Human, AI};
 
-    Mode mode = Mode.Human;
+    Mode mode = Mode.AI;
     public Player player;
-    [ContextMenuItem("Eat Food", "EatFood")]
-    public Sprite playerSprite;
+    public Brain brain;
     GameManager gm;
 
 
@@ -22,16 +21,13 @@ public class PlayerController : MonoBehaviour
     {
         gm = FindObjectOfType<GameManager>();
         player = new Player(this);
-        playerSprite = GetComponent<Sprite>();
+        brain = new Brain(player, gm);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown("space"))
-        {
-            print("space key was pressed");
-        }
+
 
 
         //Update Scale
@@ -51,8 +47,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.tag == "Food")
         {
-            Destroy(collision.gameObject);
-            gm.foodCount--;
+            gm.DestroyFood(collision.gameObject.GetComponent<Food>());
             EatFood();
         }
         else if (collision.gameObject.tag == "Player")
@@ -62,9 +57,21 @@ public class PlayerController : MonoBehaviour
             {
                 //Absorb(other);
                 player.AddSize(other.player.size);
-                gm.Kill(other);
+                other.GameOver();
+                
             }
         }
+    }
+
+    public void GameOver()
+    {
+        brain.EvaluateFitness();
+        gm.Kill(this);
+    }
+
+    public void SetNNet(NNet nnet)
+    {
+        brain.nnet = nnet;
     }
 
     void EatFood()
@@ -76,7 +83,12 @@ public class PlayerController : MonoBehaviour
     {
         if(mode == Mode.AI)
         {
-            Debug.Log("AI");
+            float[] output = brain.GetOutput();
+            //Debug.Log(output[0] + ", " + output[1]);
+            float xDiff = Mathf.Clamp(output[0], -1f, 1f);
+            float yDiff = Mathf.Clamp(output[1], -1f, 1f);
+
+            SetAcceleration(xDiff, yDiff);
         }
         else
         {
