@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 public class NEATManager : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class NEATManager : MonoBehaviour
     void Start()
     {
         generation = 1;
-        population = Utils.POP_SIZE;
+        population = GenomeUtils.POP_SIZE;
         genomes = new List<Genome>();
         for(int i = 0; i < population; i++)
         {
@@ -30,6 +31,30 @@ public class NEATManager : MonoBehaviour
         }
         SetSpecies();
         MakeNNets();
+    }
+
+    void WriteGenome()
+    {
+        string path = "Assets/Resources/genomes.txt";
+
+        StreamWriter writer = new StreamWriter(path, true);
+        writer.WriteLine("Generation " + generation);
+        foreach(Genome g in genomes)
+        {
+            writer.WriteLine("Nodes:");
+            foreach (NodeGene node in g.GetNodeGenes().Values)
+            {
+                writer.WriteLine("ID: " + node.id + " Type: " + node.type);
+            }
+            writer.WriteLine("\nConnections:");
+            foreach (ConnectionGene con in g.GetConnectionGenes().Values)
+            {
+                writer.WriteLine("ID: " + con.innovation + " Expressed: " + con.expressed + " InNode: " + con.inNode + " OutNode: " + con.outNode + " Weight: " + con.weight);
+            }
+            writer.WriteLine("\n");
+
+        }
+        writer.Close();
     }
 
     void MakeNNets()
@@ -118,7 +143,7 @@ public class NEATManager : MonoBehaviour
         }
 
         //Remaining will be crossovers
-        for (int i = champions.Count + children.Count; i < Utils.POP_SIZE; i++)
+        for (int i = champions.Count + children.Count; i < GenomeUtils.POP_SIZE; i++)
         {
             //pick random species
             Species s = species[Random.Range(0, species.Count)];
@@ -142,12 +167,14 @@ public class NEATManager : MonoBehaviour
         }
 
 
-
         genomes = new List<Genome>(champions);
         genomes = genomes.Concat(children).ToList();
 
+        //WriteGenome();
+
         SetSpecies();
         MakeNNets();
+
     }
-    
+
 }

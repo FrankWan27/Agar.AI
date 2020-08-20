@@ -30,7 +30,7 @@ public class NNet : IComparable<NNet>
     {
         foreach(NodeGene nodeGene in genome.GetNodeGenes().Values)
         {
-            Node newNode = new Node(nodeGene.id, nodeGene.activation);
+            Node newNode = new Node(nodeGene);
             switch (nodeGene.type)
             {
                 case NodeGene.Type.Input:
@@ -50,7 +50,7 @@ public class NNet : IComparable<NNet>
         {
             if (con.expressed)
             {
-                Connection newCon = new Connection(con, genome.nodes[con.inNode].type, genome.nodes[con.outNode].type);
+                Connection newCon = new Connection(con, genome.GetNodeGenes()[con.inNode].type, genome.GetNodeGenes()[con.outNode].type);
                 nodes[con.inNode].AddConnection(newCon, Node.TYPE.OUT);
                 nodes[con.outNode].AddConnection(newCon, Node.TYPE.IN);
                 connections.Add(newCon);
@@ -70,10 +70,9 @@ public class NNet : IComparable<NNet>
         List<int> indices = new List<int>();
         for (int i = 0; i < nodesLeft.Count; i++)
             indices.Add(i);
+        //Debug.Log("Start inputs");
         while (indices.Count > 0)
         {
-            Debug.Log(nodesLeft.Count);
-
             List<int> toRemove = new List<int>();
             foreach (int i in indices)
             {
@@ -89,13 +88,16 @@ public class NNet : IComparable<NNet>
                 indices.Remove(i);
             }
         }
+
+        //Debug.Log("End inputs");
     }
 
     void ProcessNodes(List<Node> nodesLeft)
     {
+        //Debug.Log("Start hidden/output");
+
         while (nodesLeft.Count > 0)
         {
-            Debug.Log(nodesLeft.Count);
             List<Node> toRemove = new List<Node>();
             foreach (Node node in nodesLeft)
             {
@@ -111,6 +113,8 @@ public class NNet : IComparable<NNet>
                 nodesLeft.Remove(node);
             }
         }
+        //Debug.Log("End hidden/output");
+
     }
 
     public float[] GetOutput(float[] input)
@@ -149,13 +153,15 @@ public class NNet : IComparable<NNet>
         public GenomeUtils.Activation activation { get; set; }
         public int id { get; set; }
         public float value { get; set; }
+        public NodeGene.Type type;
         List<Connection> inConnections;
         List<Connection> outConnections;
 
-        public Node(int id, GenomeUtils.Activation activation)
+        public Node(NodeGene nodeGene)
         {
-            this.id = id;
-            this.activation = activation;
+            this.id = nodeGene.id;
+            this.activation = nodeGene.activation;
+            this.type = nodeGene.type;
             value = 0f;
             inConnections = new List<Connection>();
             outConnections = new List<Connection>();
@@ -172,12 +178,14 @@ public class NNet : IComparable<NNet>
         public void ReceiveValue()
         {
             value = 0;
-            foreach(Connection con in inConnections)
+            foreach (Connection con in inConnections)
             {
                 value += con.value * con.weight;
                 con.Reset();
             }
             value = GenomeUtils.Activate(value, activation);
+            if (float.IsInfinity(value)) //safeguard blowing up RNN
+                value = float.MaxValue / 2;
         }
 
         public void ReceiveValue(float val)
@@ -188,7 +196,10 @@ public class NNet : IComparable<NNet>
                 value += con.value * con.weight;
                 con.Reset();
             }
+
             value = GenomeUtils.Activate(value, activation);
+            if (float.IsInfinity(value)) //safeguard blowing up RNN
+                value = float.MaxValue / 2;
         }
 
         public void TransmitValue()
@@ -228,7 +239,7 @@ public class NNet : IComparable<NNet>
         {
             inNode = con.inNode;
             outNode = con.outNode;
-            value = 0;
+            value = 0f;
             ready = false;
             weight = con.weight;
             recurrent = false;
@@ -236,12 +247,14 @@ public class NNet : IComparable<NNet>
                 recurrent = true;
             else if (inType == NodeGene.Type.Hidden && outType == NodeGene.Type.Input)
                 recurrent = true;
+            else if (inType == outType)
+                recurrent = true;
         }
 
         public void Reset()
         {
             ready = false;
-            value = 0;
+            value = 0f;
         }
 
         public void Set()

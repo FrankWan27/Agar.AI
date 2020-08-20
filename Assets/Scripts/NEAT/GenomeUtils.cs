@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public static class GenomeUtils
 {
+    public static int POP_SIZE = 50;
     public static float WEIGHT_MIN = -1f;
     public static float WEIGHT_MAX = 1f;
     public static float ASEXUAL_RATE = 0.25f;

@@ -53,13 +53,15 @@ public class NNetVisualizer : MonoBehaviour
             float colorVal = (connection.weight + 1) / 2f;
             Color color = new Color((1 - colorVal), colorVal, 0f);
             GameObject newCon = Instantiate(linePrefab, transform);
-            LineRenderer line = newCon.GetComponent<LineRenderer>();
             
+            LineRenderer line = newCon.GetComponent<LineRenderer>();
             line.SetPosition(0, nodeMap[connection.inNode].transform.position);
             line.SetPosition(1, nodeMap[connection.outNode].transform.position);
             line.startColor = color;
             line.endColor = color;
             lines.Add(newCon);
+
+            newCon.GetComponent<LineVis>().SetCon(connection);
         }
     }
 

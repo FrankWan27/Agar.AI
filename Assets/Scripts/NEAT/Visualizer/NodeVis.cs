@@ -13,9 +13,10 @@ public class NodeVis : MonoBehaviour
         label.text = node.id.ToString();
     }
 
-    public void ShowNodeInfo()
+    public NNet.Node GetNode()
     {
-        Debug.Log("Node ID: " + node.id + "\nNode value: " + node.value + "\nNode activation function: " + node.activation);
+        //Debug.Log("Node ID: " + node.id + "\nNode value: " + node.value + "\nNode activation function: " + node.activation);
+        return node;
     }
     
 }

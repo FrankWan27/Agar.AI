@@ -27,9 +27,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
-
         //Update Scale
         transform.localScale = new Vector3(player.scale, player.scale, 1);
         GetTargetDestination();
@@ -47,7 +44,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.tag == "Food")
         {
-            gm.DestroyFood(collision.gameObject.GetComponent<Food>());
+            collision.gameObject.GetComponent<Food>().Death();
             EatFood();
         }
         else if (collision.gameObject.tag == "Player")
@@ -84,7 +81,7 @@ public class PlayerController : MonoBehaviour
         if(mode == Mode.AI)
         {
             float[] output = brain.GetOutput();
-            //Debug.Log(output[0] + ", " + output[1]);
+
             float xDiff = Mathf.Clamp(output[0], -1f, 1f);
             float yDiff = Mathf.Clamp(output[1], -1f, 1f);
 

@@ -6,7 +6,7 @@ using System.Linq;
 public class Genome
 {
     Dictionary<int, ConnectionGene> connections;
-    public Dictionary<int, NodeGene> nodes;
+    Dictionary<int, NodeGene> nodes;
     public NNet nnet;
 
     public Genome()
@@ -80,6 +80,7 @@ public class Genome
         List<NodeGene> values = Enumerable.ToList(nodes.Values);
         NodeGene node1 = values[Random.Range(0, values.Count)];
         NodeGene node2 = values[Random.Range(0, values.Count)];
+
         float weight = GenomeUtils.RandomWeight();
 
         bool connectionExists = false;

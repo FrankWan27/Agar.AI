@@ -9,8 +9,10 @@ public class GUIManager : MonoBehaviour
     public RawImage NNetSprite;
     bool showNNet;
     GameManager gm;
+    DetailPanel dp;
     void Start()
     {
+        dp = FindObjectOfType<DetailPanel>();
         gm = FindObjectOfType<GameManager>();
         showNNet = NNetSprite.IsActive();
     }
@@ -28,5 +30,7 @@ public class GUIManager : MonoBehaviour
     {
         showNNet = !showNNet;
         NNetSprite.gameObject.SetActive(showNNet);
+        if (!showNNet)
+            dp.ClosePanel();
     }
 }

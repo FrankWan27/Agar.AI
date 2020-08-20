@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -19,12 +20,17 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        timer = Utils.TIMER;
         NEAT = GetComponent<NEATManager>();
         guiManager = FindObjectOfType<GUIManager>();
         players = new List<PlayerController>();
         foods = new List<Food>();
         foodMap = new Dictionary<Tuple<int, int>, List<Food>>();
+        
+        for (int i = foods.Count; i < Utils.FOOD_MAX; i++)
+        {
+            SpawnFood();
+        }
     }
 
     // Update is called once per frame
@@ -45,17 +51,14 @@ public class GameManager : MonoBehaviour
         }
 
 
-        while (foods.Count < Utils.FOOD_MAX)
-        {
-            SpawnFood();
-        }
+
     }
 
     void GameOver()
     {
         timer = Utils.TIMER;
-        while(players.Count > 0)
-            Kill(players[0]);
+        for(int i = players.Count - 1; i >= 0; i--)
+            Kill(players[i]);
 
         NEAT.NextGeneration();
         SpawnPopulation();
@@ -64,27 +67,13 @@ public class GameManager : MonoBehaviour
     void SpawnFood()
     {
         Food food = Instantiate(foodPrefab, foodParent.transform).GetComponent<Food>();
-
+        food.Initialize(this);
         foods.Add(food);
-        List<Food> list;
-        if(!foodMap.TryGetValue(food.coord, out list))
-        {
-            list = new List<Food>();
-            foodMap.Add(food.coord, list);
-        }
-        list.Add(food);
-    }
-
-    public void DestroyFood(Food food)
-    {
-        foods.Remove(food);
-        foodMap[food.coord].Remove(food);
-        Destroy(food.gameObject);
     }
 
     void SpawnPopulation()
     {
-        while (players.Count < Utils.POP_SIZE)
+        for(int i = players.Count; i < GenomeUtils.POP_SIZE; i++)
         {
             SpawnPlayer();
         }

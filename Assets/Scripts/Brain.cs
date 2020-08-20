@@ -18,10 +18,9 @@ public class Brain
     public List<float> GetInputs()
     {
         List<float> inputs = new List<float>();
-        //First input is size
-        inputs.Add(player.size);
 
         //Get 1 closest players xDiff, yDiff, sizeDiff
+        int xClosest = 1;
         List<Blob> toConsider = new List<Blob>();
         foreach(PlayerController pc in gm.players)
         {
@@ -31,7 +30,7 @@ public class Brain
             }
         }
         toConsider.Sort();
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < xClosest; i++)
         {
             if (toConsider.Count > i)
             {
@@ -49,12 +48,33 @@ public class Brain
 
         //Get 1 closest food x, y
         toConsider = new List<Blob>();
-        foreach (Food food in gm.foods)
+        Tuple<int, int> coord = Utils.GetCoordinate(player.x, player.y);
+        //check closest 15 squares
+        int searchRadius = 2;
+        for(int xDiff = -searchRadius; xDiff <= searchRadius; xDiff++)
         {
-            toConsider.Add(new Blob(player, food.x, food.y, 1));
+            for(int yDiff = -searchRadius; yDiff <= searchRadius; yDiff++)
+            {
+                int newX = coord.Item1 + xDiff;
+                int newY = coord.Item2 + yDiff;
+                if (newX >= -Utils.GAME_WIDTH / 2 && newX <= Utils.GAME_WIDTH / 2)
+                {
+                    if(newY >= -Utils.GAME_HEIGHT / 2 && newY <= Utils.GAME_HEIGHT / 2)
+                    {
+                        List<Food> foods;
+                        if (gm.foodMap.TryGetValue(new Tuple<int, int>(newX, newY), out foods))
+                        {
+                            foreach (Food food in foods)
+                            {
+                                toConsider.Add(new Blob(player, food.x, food.y, 1));
+                            }
+                        }
+                    }
+                }
+            }
         }
         toConsider.Sort();
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < xClosest; i++)
         {
             if (toConsider.Count > i)
             {
