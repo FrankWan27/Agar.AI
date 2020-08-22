@@ -18,15 +18,17 @@ public class Brain
     public List<float> GetInputs()
     {
         List<float> inputs = new List<float>();
+        //Self Size
+        //inputs.Add(player.size / Utils.MAX_SIZE);
 
-        //Get 1 closest players xDiff, yDiff, sizeDiff
-        int xClosest = 1;
+        //Get 2 closest players xDiff, yDiff, sizeDiff
+        int xClosest = 2;
         List<Blob> toConsider = new List<Blob>();
         foreach(PlayerController pc in gm.players)
         {
             if (pc.player != player)
             {
-                toConsider.Add(new Blob(player, pc.player.x, pc.player.y, player.size));
+                toConsider.Add(new Blob(player, pc.player.x, pc.player.y, pc.player.size));
             }
         }
         toConsider.Sort();
@@ -34,8 +36,8 @@ public class Brain
         {
             if (toConsider.Count > i)
             {
-                inputs.Add(toConsider[i].xDiff);
-                inputs.Add(toConsider[i].yDiff);
+                inputs.Add(toConsider[i].angle);
+                inputs.Add(toConsider[i].distance);
                 inputs.Add(toConsider[i].sizeDiff);
             }
             else
@@ -78,8 +80,8 @@ public class Brain
         {
             if (toConsider.Count > i)
             {
-                inputs.Add(toConsider[i].xDiff);
-                inputs.Add(toConsider[i].yDiff);
+                inputs.Add(toConsider[i].angle);
+                inputs.Add(toConsider[i].distance);
             }
             else
             {
@@ -95,6 +97,7 @@ public class Brain
     public void EvaluateFitness()
     {
         nnet.fitness = player.size;
+        gm.SetHighscore(nnet.fitness);
     }
 
     public float[] GetOutput()
@@ -112,6 +115,7 @@ public class Brain
         public float yDiff;
         public float sizeDiff;
         public float distance;
+        public float angle;
 
         public int CompareTo(Blob other) //sort in desc order
         {
@@ -127,7 +131,8 @@ public class Brain
             xDiff = x - player.x;
             yDiff = y - player.y;
             sizeDiff = size - player.size;
-            distance = Mathf.Abs(xDiff) + Mathf.Abs(yDiff);
+            angle = Mathf.Atan2(yDiff, xDiff) / (2 * Mathf.PI);
+            distance = Mathf.Sqrt(xDiff * xDiff + yDiff * yDiff) / Utils.MAX_DIST;
         }
     }
 

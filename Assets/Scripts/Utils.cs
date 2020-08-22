@@ -7,7 +7,8 @@ public static class Utils
     public static float GAME_HEIGHT = 40f;
     public static int FOOD_MAX = 500;
     public static float TIMER = 60f;
-
+    public static float MAX_SIZE = 100f;
+    public static float MAX_DIST = 5f;
 
     public static Color[] colors =
     {

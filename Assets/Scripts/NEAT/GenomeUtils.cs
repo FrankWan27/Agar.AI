@@ -8,12 +8,13 @@ public static class GenomeUtils
     public static float WEIGHT_MIN = -1f;
     public static float WEIGHT_MAX = 1f;
     public static float ASEXUAL_RATE = 0.25f;
+    public static float CHAMPION_RATE = 0.1f;
     public static float PERTURB_RATE = 0.9f;
     public static float MUTATION_RATE = 0.8f;
     public static float ADD_NODE_RATE = 0.03f;
     public static float ADD_CONNECTION_RATE = 0.05f;
     public static float SPECIES_DIST = 3f;
-    public enum Activation { ReLU, Tanh, Sigmoid, ELU, LeLU, None };
+    public enum Activation { Multiply, ReLU, Tanh, Sigmoid, ELU, LeLU, None };
     public static System.Array activations = System.Enum.GetValues(typeof(Activation));
     public static Activation RandomActivation()
     {
@@ -34,6 +35,8 @@ public static class GenomeUtils
             case Activation.LeLU:
                 return LeLU(val);
             case Activation.None:
+                return val;
+            case Activation.Multiply:
                 return val;
         }
         Debug.LogError("Invalid Activation Function");

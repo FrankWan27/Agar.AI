@@ -37,15 +37,18 @@ public class Player
     public void RemoveSize(float f)
     {
         size -= f;
+        if (size < 1f)
+            size = 1f;
         UpdateScale();
     }
 
-    public void Move(float dx, float dy)
+    public void Move(float angle, float speed)
     {
 
-        float speed = 2.2f * Mathf.Pow(size,-0.439f);
+        float maxSpeed = 2.2f * Mathf.Pow(size,-0.439f);
 
-        pc.transform.Translate(speed * dx * Time.deltaTime, speed * dy * Time.deltaTime, 0);
+
+        pc.transform.Translate(Mathf.Cos(angle) * maxSpeed * speed * Time.deltaTime, Mathf.Sin(angle) * maxSpeed * speed * Time.deltaTime, 0);
 
         x = pc.transform.position.x;
         y = pc.transform.position.y;

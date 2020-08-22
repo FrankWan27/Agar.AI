@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public Player player;
     public Brain brain;
     GameManager gm;
+    GameObject crown;
 
 
     float dx = 0;
@@ -20,6 +21,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         gm = FindObjectOfType<GameManager>();
+        crown = transform.GetChild(0).gameObject;
         player = new Player(this);
         brain = new Brain(player, gm);
     }
@@ -31,13 +33,14 @@ public class PlayerController : MonoBehaviour
         transform.localScale = new Vector3(player.scale, player.scale, 1);
         GetTargetDestination();
         player.Move(dx, dy);
+        Decay();
         //transform.localPosition = new Vector3(player.x, player.y, -1);
 
     }
 
     void Decay()
     {
-        player.RemoveSize(player.size * Utils.DECAY_RATE);
+        player.RemoveSize(player.size * Utils.DECAY_RATE * Time.deltaTime);
     }
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -66,8 +69,14 @@ public class PlayerController : MonoBehaviour
         gm.Kill(this);
     }
 
-    public void SetNNet(NNet nnet)
+    public void Initialize(NNet nnet, bool isChampion)
     {
+        GetComponent<SpriteRenderer>().color = Utils.RandomColor();
+        if (isChampion)
+            crown.SetActive(true);
+        else
+            crown.SetActive(false);
+
         brain.nnet = nnet;
     }
 
@@ -82,18 +91,24 @@ public class PlayerController : MonoBehaviour
         {
             float[] output = brain.GetOutput();
 
-            float xDiff = Mathf.Clamp(output[0], -1f, 1f);
-            float yDiff = Mathf.Clamp(output[1], -1f, 1f);
-
-            SetAcceleration(xDiff, yDiff);
+            float angle = (output[0]) * 2 * Mathf.PI;
+            //float speed = Mathf.Clamp(output[1], 0f, 1f);
+            float speed = 1f;
+            SetAcceleration(angle, speed);
         }
         else
         {
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            float xDiff = Mathf.Clamp(worldPosition.x - player.x, -1f, 1f);
-            float yDiff = Mathf.Clamp(worldPosition.y - player.y, -1f, 1f);
+            float xDiff = worldPosition.x - player.x;
+            float yDiff = worldPosition.y - player.y;
 
-            SetAcceleration(xDiff, yDiff);
+            float angle = Mathf.Atan2(yDiff, xDiff);
+            float distance = Mathf.Sqrt(xDiff * xDiff + yDiff * yDiff);
+
+
+            distance = Mathf.Clamp(distance, 0f, 1f);
+
+            SetAcceleration(angle, distance);
         }
     }
 

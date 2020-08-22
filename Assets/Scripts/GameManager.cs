@@ -15,11 +15,13 @@ public class GameManager : MonoBehaviour
     public GameObject foodParent; 
     public GameObject playerPrefab;
     public GameObject playerParent;
+    float highscore;
     GUIManager guiManager;
     NEATManager NEAT;
     // Start is called before the first frame update
     void Start()
     {
+        highscore = 0f;
         timer = Utils.TIMER;
         NEAT = GetComponent<NEATManager>();
         guiManager = FindObjectOfType<GUIManager>();
@@ -54,13 +56,30 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void SetHighscore(float score)
+    {
+        if(score > highscore)
+        {
+            highscore = score;
+            guiManager.SetHighscore(score);
+        }
+    }
+
     void GameOver()
     {
         timer = Utils.TIMER;
-        for(int i = players.Count - 1; i >= 0; i--)
-            Kill(players[i]);
+        for (int i = players.Count - 1; i >= 0; i--)
+            players[i].GameOver();
 
         NEAT.NextGeneration();
+        SpawnPopulation();
+    }
+
+    public void ForceLoad()
+    {
+        timer = Utils.TIMER;
+        for (int i = players.Count - 1; i >= 0; i--)
+            players[i].GameOver();
         SpawnPopulation();
     }
 
@@ -83,8 +102,8 @@ public class GameManager : MonoBehaviour
     void SpawnPlayer()
     {
         GameObject player = Instantiate(playerPrefab, playerParent.transform);
-        player.GetComponent<SpriteRenderer>().color = Utils.RandomColor();
-        player.GetComponent<PlayerController>().SetNNet(NEAT.GetNNet());
+        (NNet nnet, bool isChampion) = NEAT.GetNNet();
+        player.GetComponent<PlayerController>().Initialize(nnet, isChampion);
         players.Add(player.GetComponent<PlayerController>());
     }
 

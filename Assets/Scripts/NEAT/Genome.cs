@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public class Genome
+public class Genome : System.IComparable<Genome>
 {
     Dictionary<int, ConnectionGene> connections;
     Dictionary<int, NodeGene> nodes;
@@ -26,7 +26,7 @@ public class Genome
 
         for(int j = inputNodes + 1; j <= inputNodes + outputNodes; j++)
         {
-            AddNodeGene(new NodeGene(NodeGene.Type.Output, Counter.NextNode(), GenomeUtils.Activation.Tanh));
+            AddNodeGene(new NodeGene(NodeGene.Type.Output, Counter.NextNode(), GenomeUtils.Activation.None));
             for(int i = 1; i <= inputNodes; i++)
             {
                 float weight = GenomeUtils.RandomWeight();
@@ -81,6 +81,28 @@ public class Genome
         NodeGene node1 = values[Random.Range(0, values.Count)];
         NodeGene node2 = values[Random.Range(0, values.Count)];
 
+        if (node1.type == node2.type && node1.type != NodeGene.Type.Hidden)
+        {
+            //try again
+            AddConnectionMutation();
+            return;
+        }
+
+        bool reversed = false;
+        if(node1.type == NodeGene.Type.Hidden && node2.type == NodeGene.Type.Input)
+        {
+            reversed = true;
+        }
+        else if(node1.type == NodeGene.Type.Output && node2.type == NodeGene.Type.Input)
+        {
+            reversed = true;
+        }
+        else if(node1.type == NodeGene.Type.Output && node2.type == NodeGene.Type.Hidden)
+        {
+            reversed = true;
+        }
+
+
         float weight = GenomeUtils.RandomWeight();
 
         bool connectionExists = false;
@@ -97,7 +119,7 @@ public class Genome
         if (connectionExists)
             return;
 
-        ConnectionGene newCon = new ConnectionGene(node1.id, node2.id, weight, true, Counter.NextConnection());
+        ConnectionGene newCon = new ConnectionGene(reversed? node2.id : node1.id, reversed? node1.id : node2.id, weight, true, Counter.NextConnection());
         connections.Add(newCon.innovation, newCon);
     }
 
@@ -110,6 +132,8 @@ public class Genome
         NodeGene inNode = nodes[con.inNode];
         NodeGene outNode = nodes[con.outNode];
 
+
+
         con.expressed = false;
 
         NodeGene newNode = new NodeGene(NodeGene.Type.Hidden, Counter.NextNode());
@@ -120,5 +144,10 @@ public class Genome
         nodes.Add(newNode.id, newNode);
         connections.Add(inToNew.innovation, inToNew);
         connections.Add(newToOut.innovation, newToOut);
+    }
+
+    public int CompareTo(Genome other)
+    {
+        return nnet.CompareTo(other.nnet);
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GUIManager : MonoBehaviour
 {
     public Text PlayersRemaining;
+    public Text Highscore;
     public RawImage NNetSprite;
     bool showNNet;
     GameManager gm;
@@ -32,5 +33,10 @@ public class GUIManager : MonoBehaviour
         NNetSprite.gameObject.SetActive(showNNet);
         if (!showNNet)
             dp.ClosePanel();
+    }
+
+    public void SetHighscore(float score)
+    {
+        Highscore.text = "Highest Fitness: " + score.ToString("F2");
     }
 }

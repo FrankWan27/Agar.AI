@@ -65,36 +65,10 @@ public class NNet : IComparable<NNet>
             Debug.Log(con.inNode + " to " + con.outNode + " value: " + con.value);
         }
     }
-    void ProcessNodes(List<Node> nodesLeft, float[] input)
-    {
-        List<int> indices = new List<int>();
-        for (int i = 0; i < nodesLeft.Count; i++)
-            indices.Add(i);
-        //Debug.Log("Start inputs");
-        while (indices.Count > 0)
-        {
-            List<int> toRemove = new List<int>();
-            foreach (int i in indices)
-            {
-                if (nodesLeft[i].Ready())
-                {
-                    nodesLeft[i].ReceiveValue(input[i]);
-                    nodesLeft[i].TransmitValue();
-                    toRemove.Add(i);
-                }
-            }
-            foreach (int i in toRemove)
-            {
-                indices.Remove(i);
-            }
-        }
-
-        //Debug.Log("End inputs");
-    }
 
     void ProcessNodes(List<Node> nodesLeft)
     {
-        //Debug.Log("Start hidden/output");
+        //Debug.Log("Start hidden");
 
         while (nodesLeft.Count > 0)
         {
@@ -113,7 +87,7 @@ public class NNet : IComparable<NNet>
                 nodesLeft.Remove(node);
             }
         }
-        //Debug.Log("End hidden/output");
+        //Debug.Log("End hidden");
 
     }
 
@@ -122,20 +96,20 @@ public class NNet : IComparable<NNet>
         //Debug.Log(string.Join(", ", input));
         float[] output = new float[outputNodes.Count];
 
-        List<Node> nodesLeft = new List<Node>(inputNodes);
+        for(int i = 0; i < inputNodes.Count; i++)
+        {
+            inputNodes[i].value = input[i];
+            inputNodes[i].TransmitValue();
+        }
 
-        ProcessNodes(nodesLeft, input);
-
-        nodesLeft = new List<Node>(hiddenNodes);
-
-        ProcessNodes(nodesLeft);
-
-        nodesLeft = new List<Node>(outputNodes);
+        List<Node> nodesLeft = new List<Node>(hiddenNodes);
 
         ProcessNodes(nodesLeft);
+
 
         for(int i = 0; i < outputNodes.Count; i++)
         {
+            outputNodes[i].ReceiveValue();
             output[i] = outputNodes[i].value;
         }
 
@@ -178,28 +152,17 @@ public class NNet : IComparable<NNet>
         public void ReceiveValue()
         {
             value = 0;
+            if (activation == GenomeUtils.Activation.Multiply)
+                value = 1;
             foreach (Connection con in inConnections)
             {
-                value += con.value * con.weight;
+                if (activation == GenomeUtils.Activation.Multiply)
+                    value *= con.value * con.weight;
+                else
+                    value += con.value * con.weight;
                 con.Reset();
             }
             value = GenomeUtils.Activate(value, activation);
-            if (float.IsInfinity(value)) //safeguard blowing up RNN
-                value = float.MaxValue / 2;
-        }
-
-        public void ReceiveValue(float val)
-        {
-            value = val;
-            foreach (Connection con in inConnections)
-            {
-                value += con.value * con.weight;
-                con.Reset();
-            }
-
-            value = GenomeUtils.Activate(value, activation);
-            if (float.IsInfinity(value)) //safeguard blowing up RNN
-                value = float.MaxValue / 2;
         }
 
         public void TransmitValue()
