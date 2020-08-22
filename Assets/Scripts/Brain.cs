@@ -96,7 +96,7 @@ public class Brain
 
     public void EvaluateFitness()
     {
-        nnet.fitness = player.size;
+        nnet.fitness = player.largestSize;
         gm.SetHighscore(nnet.fitness);
     }
 

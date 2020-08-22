@@ -8,12 +8,15 @@ public class Player
     public float x;
     public float y;
     public float size;
+    public float largestSize;
     public float scale;
+    float angle;
 
     //public Color color;
 
     public Player(PlayerController pc)
     {
+        angle = 0;
         this.pc = pc;
         ResetPlayer();
     }
@@ -23,7 +26,7 @@ public class Player
         x = Random.Range(-Utils.GAME_WIDTH / 2, Utils.GAME_WIDTH / 2);
         y = Random.Range(-Utils.GAME_HEIGHT / 2, Utils.GAME_HEIGHT / 2);
         pc.transform.position = new Vector3(x, y);
-        size = 1f;
+        size = 10f;
         //color = Utils.RandomColor();
         UpdateScale();
     }
@@ -31,9 +34,18 @@ public class Player
     public void AddSize(float f)
     {
         size += f;
+        if (size > largestSize)
+            largestSize = size;
         UpdateScale();
     }
 
+    public void Split()
+    {
+        if(size >= 20f)
+        {
+            pc.gm.Split(pc, angle);
+        }
+    }
     public void RemoveSize(float f)
     {
         size -= f;
@@ -44,7 +56,7 @@ public class Player
 
     public void Move(float angle, float speed)
     {
-
+        this.angle = angle;
         float maxSpeed = 2.2f * Mathf.Pow(size,-0.439f);
 
 

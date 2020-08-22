@@ -1151,6 +1151,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 8456891788872012246, guid: b92ad9f65460ada4f907ecd2aec1991e,
     type: 3}
   playerParent: {fileID: 1782484620}
+  splitPrefab: {fileID: 1180933731244020597, guid: 487875744a007a147aafdb4ff050c0c7,
+    type: 3}
 --- !u!114 &457783506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1165,7 +1167,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   generation: 1
   inputNodes: 10
-  outputNodes: 1
+  outputNodes: 2
   C1: 1
   C2: 1
   C3: 0.3

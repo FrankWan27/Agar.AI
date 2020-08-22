@@ -7,6 +7,7 @@ TagManager:
   - Food
   - Node
   - Line
+  - Split
   layers:
   - Default
   - TransparentFX

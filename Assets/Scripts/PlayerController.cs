@@ -7,12 +7,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    enum Mode {Human, AI};
+    public enum Mode {Human, AI};
 
-    Mode mode = Mode.AI;
+    public Mode mode = Mode.AI;
     public Player player;
     public Brain brain;
-    GameManager gm;
+    public GameManager gm;
     GameObject crown;
 
 
@@ -29,11 +29,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(mode == Mode.Human && Input.GetKeyDown("space"))
+        {
+            Split();
+        }
         //Update Scale
         transform.localScale = new Vector3(player.scale, player.scale, 1);
         GetTargetDestination();
         player.Move(dx, dy);
-        Decay();
+        //Decay();
         //transform.localPosition = new Vector3(player.x, player.y, -1);
 
     }
@@ -80,9 +84,14 @@ public class PlayerController : MonoBehaviour
         brain.nnet = nnet;
     }
 
-    void EatFood()
+    public void EatFood()
     {
         player.AddSize(1f);
+    }
+
+    void Split()
+    {
+        player.Split();
     }
 
     void GetTargetDestination()
@@ -95,6 +104,12 @@ public class PlayerController : MonoBehaviour
             //float speed = Mathf.Clamp(output[1], 0f, 1f);
             float speed = 1f;
             SetAcceleration(angle, speed);
+
+            float splitUrge = GenomeUtils.Sigmoid(output[1]);
+            if(splitUrge >= 0.8f)
+            {
+                Split();
+            }
         }
         else
         {

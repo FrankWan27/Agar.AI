@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public GameObject foodParent; 
     public GameObject playerPrefab;
     public GameObject playerParent;
+    public GameObject splitPrefab;
     float highscore;
     GUIManager guiManager;
     NEATManager NEAT;
@@ -51,9 +52,6 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
-
-
-
     }
 
     public void SetHighscore(float score)
@@ -144,5 +142,12 @@ public class GameManager : MonoBehaviour
         if (index >= players.Count)
             index = 0;
         return players[index];
+    }
+
+    public void Split(PlayerController pc, float angle)
+    {
+        GameObject subPlayer = Instantiate(splitPrefab, playerParent.transform);
+        pc.player.RemoveSize(pc.player.size / 2);
+        subPlayer.GetComponent<SplitController>().Initalize(pc.player.size, angle, pc);
     }
 }

@@ -20,4 +20,15 @@ public class Counter
         connectionCounter = 1;
     }
 
+    public static void SetNodeCounter(int id)
+    {
+        if (id > nodeCounter)
+            nodeCounter = id + 1;
+    }
+    public static void SetConnectionCounter(int innovation)
+    {
+        if (innovation > connectionCounter)
+            connectionCounter = innovation + 1;
+    }
+
 }

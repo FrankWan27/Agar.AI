@@ -53,12 +53,23 @@ public class CameraController : MonoBehaviour
             if (followingPlayer == null)
                 return;
 
+            if(Input.GetKeyDown(KeyCode.H))
+            {
+                if (followingPlayer.mode == PlayerController.Mode.Human)
+                    followingPlayer.mode = PlayerController.Mode.AI;
+                else
+                    followingPlayer.mode = PlayerController.Mode.Human;
+            }
             target = followingPlayer.transform.position + new Vector3(0, 0, -10);
             targetScale = Mathf.Sqrt(followingPlayer.player.scale);
         }
         else
         {
-            followingPlayer = null;
+            if(followingPlayer != null)
+            {
+                followingPlayer.mode = PlayerController.Mode.AI;
+                followingPlayer = null;
+            }
             target = new Vector3(0, 0, -10);
             targetScale = 22f;
         }

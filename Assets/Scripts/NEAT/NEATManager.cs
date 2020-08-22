@@ -95,6 +95,7 @@ public class NEATManager : MonoBehaviour
                         NodeGene.Type type = (NodeGene.Type)System.Enum.Parse(typeof(NodeGene.Type), info[1]);
                         GenomeUtils.Activation activation = (GenomeUtils.Activation)System.Enum.Parse(typeof(GenomeUtils.Activation), info[2]);
                         genome.AddNodeGene(new NodeGene(type, id, activation));
+                        Counter.SetNodeCounter(id);
                     }
                     else if(connection)
                     {
@@ -104,6 +105,7 @@ public class NEATManager : MonoBehaviour
                         int outNode = int.Parse(info[3]);
                         float weight = float.Parse(info[4]);
                         genome.AddConnectionGene(new ConnectionGene(inNode, outNode, weight, expressed, innovation));
+                        Counter.SetConnectionCounter(innovation);
                     }
                     else
                         Debug.LogError("Invalid genome file");
