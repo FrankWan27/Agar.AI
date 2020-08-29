@@ -101,11 +101,11 @@ public class PlayerController : MonoBehaviour
             float[] output = brain.GetOutput();
 
             float angle = (output[0]) * 2 * Mathf.PI;
-            //float speed = Mathf.Clamp(output[1], 0f, 1f);
-            float speed = 1f;
+            float speed = GenomeUtils.Sigmoid(output[1]);
+            //float speed = 1f;
             SetAcceleration(angle, speed);
 
-            float splitUrge = GenomeUtils.Sigmoid(output[1]);
+            float splitUrge = GenomeUtils.Sigmoid(output[2]);
             if(splitUrge >= 0.8f)
             {
                 Split();

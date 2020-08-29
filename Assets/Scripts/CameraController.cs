@@ -9,6 +9,7 @@ public class CameraController : MonoBehaviour
     GameManager gm;
     NNetVisualizer nnetVis;
     Camera cam;
+    public SpriteRenderer bg;
     [SerializeField]
     float smoothSpeed = 0.2f;
     void Awake()
@@ -21,6 +22,11 @@ public class CameraController : MonoBehaviour
     public void ToggleCamera()
     {
         follow = !follow;
+        if (follow)
+            bg.drawMode = SpriteDrawMode.Tiled;
+        else
+            bg.drawMode = SpriteDrawMode.Simple;
+
     }
 
     private void Update()
