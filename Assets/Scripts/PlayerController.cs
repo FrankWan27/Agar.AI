@@ -104,11 +104,11 @@ public class PlayerController : MonoBehaviour
             float speed = GenomeUtils.Sigmoid(output[1]);
             //float speed = 1f;
             SetAcceleration(angle, speed);
-
-            float splitUrge = GenomeUtils.Sigmoid(output[2]);
-            if(splitUrge >= 0.8f)
+            if (output.Length > 2)
             {
-                Split();
+                float splitUrge = GenomeUtils.Sigmoid(output[2]);
+                if (splitUrge >= 0.8f)
+                    Split();
             }
         }
         else
